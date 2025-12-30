@@ -1,16 +1,5 @@
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// This file is the entry point for the React application.
+// In this specific environment, transpilation is handled via the script tag in index.html
+// using Babel Standalone to ensure maximum compatibility with static hosts like GitHub Pages.
+export {};
