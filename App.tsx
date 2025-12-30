@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, ShieldAlert, Ghost, Lock, Unlock, AlertTriangle, CheckCircle, Power } from 'lucide-react';
+import { Terminal, ShieldAlert, Ghost, Lock, Unlock, AlertTriangle, CheckCircle, Power, Eye, Radio, Activity } from 'lucide-react';
 
 const UNLOCK_PHRASE = "job holder";
 
@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [logs, setLogs] = useState<string[]>([]);
   const [purgeLogs, setPurgeLogs] = useState<string[]>([]);
   const [showScare, setShowScare] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
 
   const breachLogs = [
@@ -27,6 +28,9 @@ const App: React.FC = () => {
     "I SEE YOU THROUGH THE LENS...",
     "ACCESS DENIED. ACCESS DENIED. ACCESS DENIED.",
     "PREPARING FINAL PAYLOAD...",
+    "UPLOADING PRIVATE_GALLERY.ZIP...",
+    "HIJACKING MICROPHONE FEED...",
+    "THERMAL THROTTLING DETECTED..."
   ];
 
   const restorationLogs = [
@@ -42,6 +46,59 @@ const App: React.FC = () => {
     "SHUTTING DOWN...",
   ];
 
+  // Initialize Audio Context on first interaction
+  const initAudio = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+  };
+
+  const playScareSound = () => {
+    if (!audioContextRef.current) return;
+    const ctx = audioContextRef.current;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(100, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 0.2);
+
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+  };
+
+  const playDrone = () => {
+    if (!audioContextRef.current) return;
+    const ctx = audioContextRef.current;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(40, ctx.currentTime);
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+  };
+
+  // Trapping back button
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      window.history.pushState(null, "", window.location.href);
+      triggerVibrate([200, 100, 200]);
+    };
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const triggerVibrate = (pattern: number | number[]) => {
     if ('vibrate' in navigator) {
       navigator.vibrate(pattern);
@@ -52,14 +109,15 @@ const App: React.FC = () => {
     if (screen === 'LOCKED') {
       let i = 0;
       const interval = setInterval(() => {
-        setLogs(prev => [...prev, breachLogs[i % breachLogs.length]].slice(-12));
+        setLogs(prev => [...prev, breachLogs[i % breachLogs.length]].slice(-14));
         i++;
-        if (Math.random() > 0.96) {
+        if (Math.random() > 0.95) {
           setShowScare(true);
+          playScareSound();
           triggerVibrate([100, 50, 100]);
-          setTimeout(() => setShowScare(false), 200);
+          setTimeout(() => setShowScare(false), 150);
         }
-      }, 700);
+      }, 600);
       return () => clearInterval(interval);
     }
   }, [screen]);
@@ -77,7 +135,7 @@ const App: React.FC = () => {
           triggerVibrate([500]);
           setTimeout(() => setScreen('OFFLINE'), 1500);
         }
-      }, 350);
+      }, 300);
       return () => clearInterval(interval);
     }
   }, [screen]);
@@ -87,6 +145,7 @@ const App: React.FC = () => {
   }, [logs, purgeLogs]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    initAudio();
     const val = e.target.value.toLowerCase();
     setInputText(val);
     if (val === UNLOCK_PHRASE) {
@@ -142,36 +201,44 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="relative h-screen w-screen bg-black overflow-hidden flex flex-col font-mono select-none">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,_transparent_30%,_rgba(150,0,0,0.3)_100%)]"></div>
+    <div className="relative h-screen w-screen bg-black overflow-hidden flex flex-col font-mono select-none" onClick={initAudio}>
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,_transparent_30%,_rgba(150,0,0,0.4)_100%)]"></div>
       
       {showScare && (
-        <div className="absolute inset-0 z-50 bg-red-950 flex items-center justify-center overflow-hidden">
-          <Ghost size={350} className="text-red-500 opacity-80 animate-ping absolute" />
-          <div className="text-white text-9xl font-black opacity-20">VOID</div>
-          <div className="absolute top-0 left-0 w-full h-full opacity-40 mix-blend-overlay bg-[url('https://picsum.photos/800/1200?grayscale')] scale-150 rotate-12"></div>
+        <div className="absolute inset-0 z-[110] bg-red-950 flex items-center justify-center overflow-hidden">
+          <Ghost size={400} className="text-red-500 opacity-90 animate-ping absolute" />
+          <div className="text-white text-9xl font-black opacity-10 tracking-widest">HELP</div>
+          <div className="absolute top-0 left-0 w-full h-full opacity-40 mix-blend-overlay bg-[url('https://picsum.photos/1000/1500?grayscale')] grayscale scale-150 -rotate-12 blur-sm"></div>
         </div>
       )}
 
-      <div className="p-4 bg-red-950/80 flex items-center justify-between border-b border-red-600 z-10">
+      {/* Top Header */}
+      <div className="p-4 bg-red-950/90 flex items-center justify-between border-b border-red-600 z-10">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="text-red-500 animate-bounce" size={18} />
-          <h1 className="text-lg font-black uppercase tracking-tighter glitch-text">System Hacked</h1>
+          <ShieldAlert className="text-red-500 animate-pulse" size={22} />
+          <div className="flex flex-col">
+            <h1 className="text-sm font-black uppercase tracking-tighter glitch-text leading-none">CRITICAL_OVERRIDE</h1>
+            <span className="text-[8px] text-red-500 opacity-70">UID: ALPHA-9-001</span>
+          </div>
         </div>
-        <div className="text-[10px] bg-red-600 text-black px-1 font-bold">LIVE_FEED</div>
+        <div className="flex items-center gap-2">
+          <Activity size={12} className="text-red-600 animate-pulse" />
+          <div className="text-[10px] bg-red-600 text-black px-1 font-bold">LOCKED</div>
+        </div>
       </div>
 
-      <div className="flex-1 p-3 flex flex-col gap-3 overflow-hidden">
-        <div className="flex-1 bg-black border border-red-900/50 p-3 rounded flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between mb-2 text-red-500 text-[10px] border-b border-red-900/30 pb-1 opacity-50">
-            <span className="flex items-center gap-1"><Terminal size={10} /> STREAM_OUT</span>
-            <span>ENCR_AES_256</span>
+      <div className="flex-1 p-4 flex flex-col gap-4 overflow-hidden">
+        {/* Hacker Log Display */}
+        <div className="flex-1 bg-black/80 border border-red-900/40 p-3 rounded-lg flex flex-col overflow-hidden backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-2 text-red-600 text-[10px] border-b border-red-900/20 pb-1">
+            <span className="flex items-center gap-1 font-bold"><Radio size={10} /> REMOTE_LISTEN: ACTIVE</span>
+            <span className="animate-pulse">REC ●</span>
           </div>
           <div className="flex-1 overflow-y-auto space-y-1 text-[11px] leading-tight">
             {logs.map((log, idx) => (
               <div key={idx} className="flex gap-2">
-                <span className="text-red-900 shrink-0">#</span>
-                <span className={idx === logs.length - 1 ? 'text-red-500 font-bold' : 'text-red-700'}>
+                <span className="text-red-900 shrink-0 font-bold opacity-40 tracking-tighter">[{new Date().toLocaleTimeString([], {hour12: false})}]</span>
+                <span className={idx === logs.length - 1 ? 'text-red-400 font-bold' : 'text-red-800'}>
                   {log}
                 </span>
               </div>
@@ -180,52 +247,65 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-red-950/20 border border-red-600/50 p-4 rounded-lg text-center flicker">
-          <ShieldAlert size={36} className="mx-auto mb-2 text-red-500" />
-          <h2 className="text-xl font-black mb-1 glitch-text uppercase">Fatal Security Loss</h2>
-          <p className="text-red-400 text-[11px] leading-relaxed mb-4">
-            Remote access established. Your camera is active. Private data is being synced to the master server.
-          </p>
+        {/* Threat Level & Key Input */}
+        <div className="bg-red-950/30 border border-red-600/40 p-5 rounded-xl text-center relative overflow-hidden">
+          {/* Faint static pattern */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
           
-          <div className="flex flex-col gap-2 mt-2">
-            <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-red-600 mb-1">
-              <Lock size={10} />
-              <span>OVERRIDE KEY REQUIRED</span>
-            </div>
+          <div className="relative z-10">
+            <Eye size={40} className="mx-auto mb-3 text-red-600 opacity-80" />
+            <h2 className="text-lg font-black mb-1 glitch-text uppercase tracking-widest text-red-500">I AM WATCHING</h2>
+            <p className="text-red-600/80 text-[10px] leading-relaxed mb-5 px-4 font-bold italic">
+              "Every move you make, every click you take... I'm already inside."
+            </p>
             
-            <input
-              type="text"
-              inputMode="text"
-              value={inputText}
-              onChange={handleInputChange}
-              placeholder="Enter Key..."
-              autoComplete="off"
-              className="w-full bg-black border border-red-900/80 p-3 text-center text-red-500 focus:outline-none focus:border-red-500 transition-colors uppercase tracking-[0.3em] text-xs font-bold"
-              autoFocus
-            />
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-2 text-[10px] font-black text-red-500 opacity-60">
+                <Lock size={12} />
+                <span>TERMINAL ACCESS KEY</span>
+              </div>
+              
+              <input
+                type="text"
+                value={inputText}
+                onChange={handleInputChange}
+                placeholder="BYPASS_CODE"
+                autoComplete="off"
+                spellCheck="false"
+                className="w-full bg-black/60 border-2 border-red-900/50 p-4 text-center text-red-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all uppercase tracking-[0.5em] text-sm font-black rounded-lg placeholder:opacity-20"
+                autoFocus
+              />
+              <div className="text-[8px] text-red-900 font-bold tracking-widest mt-1">
+                ERROR: 5 UNSUCCESSFUL ATTEMPTS REMAINING
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-2 bg-red-950 flex justify-between text-[9px] uppercase tracking-widest text-red-500 border-t border-red-700/50">
-        <div className="flex gap-3">
-          <span>ID: BR-9921</span>
-          <span>MEM: PURGE</span>
+      {/* Footer Status */}
+      <div className="p-3 bg-red-950/80 flex justify-between items-center text-[9px] uppercase tracking-widest text-red-600 border-t border-red-700/40 font-black">
+        <div className="flex gap-4">
+          <span className="flex items-center gap-1"><AlertTriangle size={10} /> FAN_FAIL</span>
+          <span className="flex items-center gap-1 text-red-400">72°C <Activity size={8}/></span>
         </div>
-        <div className="animate-pulse">TRANSFERRING... 82%</div>
+        <div className="animate-pulse bg-red-600 text-black px-1">UPLOADING_SENSITIVE_DATA...</div>
       </div>
 
+      {/* Manual Fullscreen Trigger (Hidden/Discreet) */}
       <button 
         onClick={() => {
             const el = document.documentElement;
             if (el.requestFullscreen) {
               el.requestFullscreen().catch(() => {});
-              triggerVibrate(50);
             }
+            initAudio();
+            playDrone();
+            triggerVibrate(50);
         }}
-        className="fixed top-14 right-4 bg-red-600/10 text-red-600 p-2 rounded-full border border-red-600/20 active:bg-red-600 active:text-black transition-all"
+        className="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-red-600/5 flex items-center justify-center border border-red-600/10 active:bg-red-600 transition-all z-[120]"
       >
-        <Power size={14} />
+        <Power size={16} className="text-red-600/20" />
       </button>
     </div>
   );
