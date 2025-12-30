@@ -1,0 +1,7 @@
+{
+  "name": "System Breach Simulator",
+  "description": "An immersive horror-themed cybersecurity simulation designed for theatrical or prank purposes, featuring glitch effects and a specific unlock mechanism.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
