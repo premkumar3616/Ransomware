@@ -42,22 +42,18 @@ const App: React.FC = () => {
     "SHUTTING DOWN...",
   ];
 
-  // Mobile Haptic Support
   const triggerVibrate = (pattern: number | number[]) => {
     if ('vibrate' in navigator) {
       navigator.vibrate(pattern);
     }
   };
 
-  // Hacker Log Cycle
   useEffect(() => {
     if (screen === 'LOCKED') {
       let i = 0;
       const interval = setInterval(() => {
         setLogs(prev => [...prev, breachLogs[i % breachLogs.length]].slice(-12));
         i++;
-        
-        // Random scare jump and vibration
         if (Math.random() > 0.96) {
           setShowScare(true);
           triggerVibrate([100, 50, 100]);
@@ -68,7 +64,6 @@ const App: React.FC = () => {
     }
   }, [screen]);
 
-  // Purge Log Cycle
   useEffect(() => {
     if (screen === 'PURGING') {
       let i = 0;
@@ -101,7 +96,6 @@ const App: React.FC = () => {
     }
   };
 
-  // 1. OFFLINE STATE (Simulated Phone Shutdown)
   if (screen === 'OFFLINE') {
     return (
       <div className="h-screen w-screen bg-black flex items-center justify-center cursor-none">
@@ -110,7 +104,6 @@ const App: React.FC = () => {
     );
   }
 
-  // 2. DECODING STATE
   if (screen === 'DECODING') {
     return (
       <div className="h-screen w-screen bg-white flex flex-col items-center justify-center p-8 animate-pulse">
@@ -120,7 +113,6 @@ const App: React.FC = () => {
     );
   }
 
-  // 3. PURGING STATE
   if (screen === 'PURGING') {
     return (
       <div className="h-screen w-screen bg-black p-6 font-mono flex flex-col overflow-hidden">
@@ -149,13 +141,10 @@ const App: React.FC = () => {
     );
   }
 
-  // 4. LOCKED STATE (Default)
   return (
     <div className="relative h-screen w-screen bg-black overflow-hidden flex flex-col font-mono select-none">
-      {/* Background Red Glow */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,_transparent_30%,_rgba(150,0,0,0.3)_100%)]"></div>
       
-      {/* Ghost Jump Scare */}
       {showScare && (
         <div className="absolute inset-0 z-50 bg-red-950 flex items-center justify-center overflow-hidden">
           <Ghost size={350} className="text-red-500 opacity-80 animate-ping absolute" />
@@ -164,7 +153,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Top Banner */}
       <div className="p-4 bg-red-950/80 flex items-center justify-between border-b border-red-600 z-10">
         <div className="flex items-center gap-2">
           <AlertTriangle className="text-red-500 animate-bounce" size={18} />
@@ -174,7 +162,6 @@ const App: React.FC = () => {
       </div>
 
       <div className="flex-1 p-3 flex flex-col gap-3 overflow-hidden">
-        {/* Terminal Section */}
         <div className="flex-1 bg-black border border-red-900/50 p-3 rounded flex flex-col overflow-hidden">
           <div className="flex items-center justify-between mb-2 text-red-500 text-[10px] border-b border-red-900/30 pb-1 opacity-50">
             <span className="flex items-center gap-1"><Terminal size={10} /> STREAM_OUT</span>
@@ -193,7 +180,6 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Threat Message UI */}
         <div className="bg-red-950/20 border border-red-600/50 p-4 rounded-lg text-center flicker">
           <ShieldAlert size={36} className="mx-auto mb-2 text-red-500" />
           <h2 className="text-xl font-black mb-1 glitch-text uppercase">Fatal Security Loss</h2>
@@ -221,7 +207,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Immersive Status Bar */}
       <div className="p-2 bg-red-950 flex justify-between text-[9px] uppercase tracking-widest text-red-500 border-t border-red-700/50">
         <div className="flex gap-3">
           <span>ID: BR-9921</span>
@@ -230,7 +215,6 @@ const App: React.FC = () => {
         <div className="animate-pulse">TRANSFERRING... 82%</div>
       </div>
 
-      {/* Lock Button to trigger Fullscreen for full mobile effect */}
       <button 
         onClick={() => {
             const el = document.documentElement;

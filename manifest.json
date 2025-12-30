@@ -1,0 +1,16 @@
+
+{
+  "short_name": "SysBreach",
+  "name": "System Breach Simulator",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/752/752755.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000"
+}

@@ -1,20 +1,20 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# System Breach Simulator (Horror Prank App)
 
-This contains everything you need to run your app locally.
+This is a mobile-optimized horror prank application.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1ydn3PDaBVbDLQ3fKjVcdkwqti3uyROPW
+## How to use as a "Stuck" Mobile App:
 
-## Run Locally
+1. **Host on GitHub Pages**:
+   - Upload all files to a GitHub repository.
+   - Enable GitHub Pages in Settings.
+   
+2. **Install on Phone**:
+   - Open your GitHub Pages URL in Safari (iOS) or Chrome (Android).
+   - iOS: Tap the **Share** button -> **Add to Home Screen**.
+   - Android: Tap the **Three Dots** -> **Install App** or **Add to Home Screen**.
 
-**Prerequisites:**  Node.js
+3. **Launch**:
+   - Open the app from your home screen. It will launch in full-screen mode without any browser bars, effectively "locking" the user in until they enter the secret phrase.
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Secret Key:** `job holder`
